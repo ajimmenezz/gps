@@ -1,0 +1,18 @@
+{
+    "require": {
+        "codeigniter/framework": "^3.1",
+        "firebase/php-jwt": "^5.0",
+        "phpmailer/phpmailer": "^6.0",
+        "fpdf/fpdf": "^1.82",
+        "nesbot/carbon": "1.39.1"   
+    },
+    "autoload":{
+        "psr-4":{
+            "Models\\" : "application/models/",
+            "Libraries\\" : "application/libraries/",
+            "Controllers\\" : "application/controllers/"
+        }
+
+    }
+
+}

@@ -1,0 +1,8 @@
+.color-light-gray{
+    color: rgb(120,120,120);
+}
+
+.color-red, 
+.color-danger{
+    color:red;
+}

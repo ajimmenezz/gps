@@ -1,0 +1,322 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: "universal-platform";
+  src:url("fonts/universal-platform.eot");
+  src:url("fonts/universal-platform.eot?#iefix") format("embedded-opentype"),
+    url("fonts/universal-platform.woff") format("woff"),
+    url("fonts/universal-platform.ttf") format("truetype"),
+    url("fonts/universal-platform.svg#universal-platform") format("svg");
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+[data-icon]:before {
+  font-family: "universal-platform" !important;
+  content: attr(data-icon);
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[class^="universalicon-"]:before,
+[class*=" universalicon-"]:before {
+  font-family: "universal-platform" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.universalicon-world:before {
+  content: "\61";
+}
+.universalicon-visible:before {
+  content: "\62";
+}
+.universalicon-trash-2:before {
+  content: "\63";
+}
+.universalicon-target-fixed:before {
+  content: "\65";
+}
+.universalicon-target:before {
+  content: "\64";
+}
+.universalicon-lock:before {
+  content: "\66";
+}
+.universalicon-geofence:before {
+  content: "\67";
+}
+.universalicon-polyline:before {
+  content: "\68";
+}
+.universalicon-polygon:before {
+  content: "\69";
+}
+.universalicon-notification:before {
+  content: "\6a";
+}
+.universalicon-pencil:before {
+  content: "\6b";
+}
+.universalicon-chart-combo:before {
+  content: "\6c";
+}
+.universalicon-streetview:before {
+  content: "\6d";
+}
+.universalicon-stop:before {
+  content: "\6e";
+}
+.universalicon-car:before {
+  content: "\6f";
+}
+.universalicon-traffic-jam:before {
+  content: "\70";
+}
+.universalicon-high-priority-filled:before {
+  content: "\71";
+}
+.universalicon-world-location:before {
+  content: "\73";
+}
+.universalicon-arrow-left:before {
+  content: "\74";
+}
+.universalicon-arrow-right:before {
+  content: "\75";
+}
+.universalicon-right:before {
+  content: "\76";
+}
+.universalicon-cancel:before {
+  content: "\77";
+}
+.universalicon-markers:before {
+  content: "\79";
+}
+.universalicon-marker:before {
+  content: "\7a";
+}
+.universalicon-map-marker:before {
+  content: "\41";
+}
+.universalicon-restore:before {
+  content: "\42";
+}
+.universalicon-send:before {
+  content: "\43";
+}
+.universalicon-shutdown:before {
+  content: "\44";
+}
+.universalicon-track-order:before {
+  content: "\45";
+}
+.universalicon-ok-filled:before {
+  content: "\46";
+}
+.universalicon-save:before {
+  content: "\47";
+}
+.universalicon-plus:before {
+  content: "\48";
+}
+.universalicon-search:before {
+  content: "\49";
+}
+.universalicon-add:before {
+  content: "\4a";
+}
+.universalicon-eliminar-menos:before {
+  content: "\4b";
+}
+.universalicon-eliminar-menos-circulo:before {
+  content: "\4c";
+}
+.universalicon-log-out:before {
+  content: "\4d";
+}
+.universalicon-log-in:before {
+  content: "\4e";
+}
+.universalicon-close-off-2:before {
+  content: "\4f";
+}
+.universalicon-edit-pen-1:before {
+  content: "\50";
+}
+.universalicon-arrow-expand:before {
+  content: "\51";
+}
+.universalicon-arrow-collapse:before {
+  content: "\52";
+}
+.universalicon-signal-full:before {
+  content: "\53";
+}
+.universalicon-signal-mid:before {
+  content: "\54";
+}
+.universalicon-no-signal:before {
+  content: "\55";
+}
+.universalicon-sync:before {
+  content: "\78";
+}
+.universalicon-sort-alphabet-inverted:before {
+  content: "\56";
+}
+.universalicon-sort-alphabet:before {
+  content: "\57";
+}
+.universalicon-zoom-in:before {
+  content: "\58";
+}
+.universalicon-smartphone:before {
+  content: "\59";
+}
+.universalicon-palette-color:before {
+  content: "\5a";
+}
+.universalicon-filter:before {
+  content: "\30";
+}
+.universalicon-settings:before {
+  content: "\31";
+}
+.universalicon-play:before {
+  content: "\33";
+}
+.universalicon-play-stop:before {
+  content: "\34";
+}
+.universalicon-forward-x5:before {
+  content: "\37";
+}
+.universalicon-forward:before {
+  content: "\38";
+}
+.universalicon-left:before {
+  content: "\39";
+}
+.universalicon-sim-card:before {
+  content: "\21";
+}
+.universalicon-monitor:before {
+  content: "\22";
+}
+.universalicon-home:before {
+  content: "\23";
+}
+.universalicon-card-id:before {
+  content: "\24";
+}
+.universalicon-depto:before {
+  content: "\25";
+}
+.universalicon-book:before {
+  content: "\26";
+}
+.universalicon-image:before {
+  content: "\27";
+}
+.universalicon-layers:before {
+  content: "\28";
+}
+.universalicon-qrcode:before {
+  content: "\29";
+}
+.universalicon-printer:before {
+  content: "\2a";
+}
+.universalicon-shopping-cart:before {
+  content: "\2b";
+}
+.universalicon-support-customer:before {
+  content: "\2c";
+}
+.universalicon-denied-outline:before {
+  content: "\2d";
+}
+.universalicon-unlock:before {
+  content: "\2e";
+}
+.universalicon-checklist:before {
+  content: "\2f";
+}
+.universalicon-user:before {
+  content: "\72";
+}
+.universalicon-add-user-group:before {
+  content: "\3a";
+}
+.universalicon-airplane-off:before {
+  content: "\3b";
+}
+.universalicon-airplane-on:before {
+  content: "\3c";
+}
+.universalicon-alert:before {
+  content: "\3d";
+}
+.universalicon-acrobat:before {
+  content: "\3e";
+}
+.universalicon-excel:before {
+  content: "\3f";
+}
+.universalicon-file-pdf:before {
+  content: "\40";
+}
+.universalicon-file-xls:before {
+  content: "\5b";
+}
+.universalicon-print:before {
+  content: "\5d";
+}
+.universalicon-file-pdf-o:before {
+  content: "\5e";
+}
+.universalicon-file-jpg:before {
+  content: "\32";
+}
+.universalicon-file-csv:before {
+  content: "\35";
+}
+.universalicon-file-kml:before {
+  content: "\36";
+}
+.universalicon-calendar:before {
+  content: "\5f";
+}
+.universalicon-calendar-o:before {
+  content: "\60";
+}
+.universalicon-camera:before {
+  content: "\7b";
+}
+.universalicon-forward-x1:before {
+  content: "\7c";
+}
+.universalicon-forward-x3:before {
+  content: "\7d";
+}
+.universalicon-info:before {
+  content: "\7e";
+}
+.universalicon-help:before {
+  content: "\5c";
+}
