@@ -16,134 +16,113 @@ class DataBaseDevice extends DataBase
         $this->dataBaseUser = new DataBaseUser();
     }
 
-    private function getPartitionByUser($user)
-    {
-        $query = "select 
-        concat('p',td.id) as partit
-        from t_usuarios tu
-        inner join t_dispositivos td on tu.idCliente = td.idCliente
-        where tu.id = '${user}'";
-        return $this->db->query($query)->result();
-    }
-
-    public function getUserDevicesInfo($userID, $deviceStatus = 1)
+    private function getPartitionByUser($userID, $deviceStatus = 1)
     {
         $clientID = $this->dataBaseUser->getClientID($userID);
         $clientType = $this->dataBaseUser->getClientType($clientID);
         $userType = $this->dataBaseUser->getUserType($userID);
 
-        $queryDeviceFilter = "";
-        $queryWhereClausule = "";
-
         switch ($clientType) {
             case 1: //Cliente
                 if ($userType == 1) { //Cliente
-                    $queryDeviceFilter = "INNER JOIN t_usuarios as users
-                    on devices.idCliente = users.idCliente
-                    where users.id = ${userID} and devices.estatus = ${deviceStatus} ";
+                    $query = "
+                    select 
+                    td.id,
+                    concat('p',td.id) as partit
+                    from t_usuarios tu
+                    inner join t_dispositivos td on tu.idCliente = td.idCliente
+                    where tu.id = '${userID}' and td.estatus = ${deviceStatus}
+                    
+                    union 
 
-                    $queryWhereClausule = "AND users.id = fleets.idUsuario  ";
+                    select 
+                    td.id,
+                    concat('p',td.id) as partit
+                    from t_flotilla_relacion_dispositivo tfrd
+                    inner join t_dispositivos td on td.id = tfrd.idDispositivo
+                    where idFlotilla in (select id from t_flotillas where idUsuario = '${userID}')
+                    and td.estatus = ${deviceStatus}";
                 } else if ($userType == 2) { //Asociado
-                    $queryDeviceFilter = "INNER JOIN t_filtro_dispositivos as deviceFilter
-                    on deviceFilter.idDispositivo = devices.id
-                    where deviceFilter.idUsuario = ${userID} and devices.estatus = ${deviceStatus} ";
+                    $query = "select 
+                    td.id,
+                    concat('p',td.id) as partit
+                    from t_dispositivos td 
+                    inner join t_filtro_dispositivos tfd on td.id = tfd.idDispositivo
+                    where tfd.idUsuario = '${userID}' and td.estatus = ${deviceStatus}
 
-                    $queryWhereClausule = "AND deviceFilter.idUsuario = fleets.idUsuario   ";
+                    union 
+
+                    select
+                    td.id,
+                    concat('p',td.id) as partit
+                    from t_dispositivos td
+                    inner join t_filtro_dispositivos tfd on td.id = tfd.idDispositivo
+                    inner join t_flotilla_relacion_dispositivo tfrd on td.id = tfrd.idDispositivo
+                    inner join t_flotillas tf on tfrd.idFlotilla = tf.id
+                    where tf.idUsuario = '${userID}' and td.estatus = ${deviceStatus}";                    
                 }
                 break;
 
             case 2: //Distribuidor
-                $queryDeviceFilter = "INNER JOIN t_clientes as client
-                ON client.id = devices.idCliente
-                
-                WHERE devices.estatus = ${deviceStatus} AND
-                client.idPropietario = (SELECT usuario.idCliente 
-										FROM t_usuarios as usuario
-                                        WHERE usuario.id = ${userID})";
+                $query = "select 
+                    td.id,
+                    concat('p',td.id) as partit
+                    from t_dispositivos td 
+                    inner join t_clientes tc on tc.id = td.idCliente
+                    inner join t_usuarios tu on tu.idCliente = tc.idPropietario
+                    where td.estatus = ${deviceStatus}
+                    and tu.id = '${userID}'
+                    
+                    union
 
-                $queryWhereClausule = "AND ${userID} = fleets.idUsuario";
+                    select 
+                    td.id,
+                    concat('p',td.id) as partit
+                    from t_dispositivos td 
+                    inner join t_flotilla_relacion_dispositivo tfrd on td.id = tfrd.idDispositivo
+                    inner join t_flotillas tf on tfrd.idFlotilla = tf.id
+                    where td.estatus = ${deviceStatus}
+                    and tf.idUsuario = '${userID}'
+                    ";
                 break;
         }
 
-        // $partitions = $this->getPartitionByUser($userID);
-        $query = "";
-        // foreach ($partitions as $k => $v) {
-        //     if($k > 0){
-        //         $query.= ' UNION ';
-        //     }
+        $query = "select group_concat(id) as ids, group_concat(partit) as partits
+        from (" . $query . ") as tf";
 
-            $query .= "SELECT devices.id, devices.idCliente clientID, marker.id markerType, marker.nombre markerName, devices.imei,
-        devices.alias, devices.estatus status, devices.fechaCreacion as creationTimestamp,
-        reports.lat, reports.lng, reports.direccion address, reports.fecha timestampReport, 
-        fleetFilter.idFlotilla as fleetID,
-        deviceConfig.reporteMovimiento as deviceDrivingInterval, deviceConfig.reporteDetenido as deviceParkingInterval,
-        gsm.fuerzaSenal as gsmStrength
+        return $this->db->query($query)->result();
+    }
 
-        FROM t_dispositivos as devices
+    public function getUserDevicesInfo($userID, $deviceStatus = 1)
+    {
 
-        LEFT JOIN t_reportes_ultimo as lastReport
-        on lastReport.imei = devices.imei
+        $partitions = $this->getPartitionByUser($userID, $deviceStatus)[0];
 
-        LEFT JOIN t_reportes  as reports
-        on reports.id = lastReport.idReporte
-
-        LEFT JOIN t_reportes_gsm as gsm
-        on gsm.idReporte = lastReport.idReporte
-
-        LEFT JOIN cat_tipomarcador as marker
-        on marker.id = devices.idTipoMarcador
-
-        INNER JOIN t_flotilla_relacion_dispositivo AS fleetFilter
-        ON fleetFilter.idDispositivo = devices.id
-
-        INNER JOIN t_flotillas AS fleets
-        ON fleets.id = fleetFilter.idFlotilla
-
-        LEFT JOIN t_dispositivos_configuracion as deviceConfig
-        on deviceConfig.imei = devices.imei
-        
-        ${queryDeviceFilter} ${queryWhereClausule}
-
-        UNION
-
-        SELECT devices.id, devices.idCliente clientID, marker.id markerType, marker.nombre markerName, devices.imei,
-        devices.alias, devices.estatus status, devices.fechaCreacion as creationTimestamp,
-        reports.lat, reports.lng, reports.direccion address, reports.fecha timestampReport, 
-        NULL as fleetID,
-        deviceConfig.reporteMovimiento as deviceDrivingInterval, deviceConfig.reporteDetenido as deviceParkingInterval,
-        gsm.fuerzaSenal as gsmStrength
-
-        FROM t_dispositivos as devices
-
-        LEFT JOIN t_reportes_ultimo as lastReport
-        on lastReport.imei = devices.imei
-
-        LEFT JOIN t_reportes  as reports
-        on reports.id = lastReport.idReporte
-
-        LEFT JOIN t_reportes_gsm as gsm
-        on gsm.idReporte = lastReport.idReporte
-
-        LEFT JOIN cat_tipomarcador as marker
-        on marker.id = devices.idTipoMarcador
-
-        LEFT JOIN t_dispositivos_configuracion as deviceConfig
-        on deviceConfig.imei = devices.imei
-
-        ${queryDeviceFilter} 
-        AND devices.id NOT IN 
-        (
-            SELECT fleetFilter.idDispositivo 
-            FROM t_flotilla_relacion_dispositivo AS fleetFilter
-
-            INNER JOIN t_flotillas AS fleets
-            ON fleets.id = fleetFilter.idFlotilla
-
-            where fleets.idUsuario = ${userID}
-        ) ";
-        //}
-
-        //var_dump($query);
+        $query = "
+        select 
+            devices.id,
+            devices.idCliente clientID,
+            marker.id markerType,
+            marker.nombre markerName,
+            devices.imei,
+            devices.alias,
+            devices.estatus STATUS,
+            devices.fechaCreacion AS creationTimestamp,
+            reports.lat,
+            reports.lng,
+            reports.direccion address,
+            reports.fecha timestampReport,
+            (select idFlotilla from t_flotilla_relacion_dispositivo where idDispositivo = devices.id) as fleetID,
+            deviceConfig.reporteMovimiento AS deviceDrivingInterval,
+            deviceConfig.reporteDetenido AS deviceParkingInterval,
+            76 AS gsmStrength            
+        from t_dispositivos devices
+        LEFT JOIN cat_tipomarcador AS marker ON marker.id = devices.idTipoMarcador
+        LEFT JOIN t_reportes PARTITION (" . $partitions->partits . ") AS reports ON reports.id in (select MAX(id) as id from t_reportes PARTITION(" . $partitions->partits . ") group by deviceId)
+        LEFT JOIN t_dispositivos_configuracion AS deviceConfig ON deviceConfig.imei = devices.imei
+        where devices.id in (" . $partitions->ids . ")
+        group by devices.id;
+        ";         
 
         $resultSet = $this->db->query($query);
         $resultSet = $resultSet->result();

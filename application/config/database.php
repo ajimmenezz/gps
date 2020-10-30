@@ -75,7 +75,7 @@ $query_builder = TRUE;
 
 $db['universal_test'] = array(
 	'dsn'	=> '',
-	'hostname' => 'siccobsolutions.com.mx',
+	'hostname' => 'localhost',
 	'username' => 'universal',
 	'password' => '@#Un1vers4l.',
 	'database' => 'universal_test',
