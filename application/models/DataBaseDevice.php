@@ -59,7 +59,7 @@ class DataBaseDevice extends DataBase
                     inner join t_filtro_dispositivos tfd on td.id = tfd.idDispositivo
                     inner join t_flotilla_relacion_dispositivo tfrd on td.id = tfrd.idDispositivo
                     inner join t_flotillas tf on tfrd.idFlotilla = tf.id
-                    where tf.idUsuario = '${userID}' and td.estatus = ${deviceStatus}";                    
+                    where tf.idUsuario = '${userID}' and td.estatus = ${deviceStatus}";
                 }
                 break;
 
@@ -87,46 +87,47 @@ class DataBaseDevice extends DataBase
                 break;
         }
 
-        $query = "select group_concat(id) as ids, group_concat(partit) as partits
-        from (" . $query . ") as tf";
+        //$query = "select group_concat(id) as ids, group_concat(partit) as partits from (" . $query . ") as tf";
 
         return $this->db->query($query)->result();
     }
 
     public function getUserDevicesInfo($userID, $deviceStatus = 1)
     {
+        $result = [];
+        $partitions = $this->getPartitionByUser($userID, $deviceStatus);
 
-        $partitions = $this->getPartitionByUser($userID, $deviceStatus)[0];
+        foreach ($partitions as $k => $v) {
+            $query = "
+            select 
+                devices.id,
+                devices.idCliente clientID,
+                marker.id markerType,
+                marker.nombre markerName,
+                devices.imei,
+                devices.alias,
+                devices.estatus STATUS,
+                devices.fechaCreacion AS creationTimestamp,
+                reports.lat,
+                reports.lng,
+                reports.direccion address,
+                reports.fecha timestampReport,
+                (select idFlotilla from t_flotilla_relacion_dispositivo where idDispositivo = devices.id) as fleetID,
+                deviceConfig.reporteMovimiento AS deviceDrivingInterval,
+                deviceConfig.reporteDetenido AS deviceParkingInterval,
+                76 AS gsmStrength            
+            from t_dispositivos devices
+            LEFT JOIN cat_tipomarcador AS marker ON marker.id = devices.idTipoMarcador
+            LEFT JOIN t_reportes PARTITION (" . $v->partit . ") AS reports ON reports.id in (select MAX(id) as id from t_reportes PARTITION(" . $v->partit . ") group by deviceId)
+            LEFT JOIN t_dispositivos_configuracion AS deviceConfig ON deviceConfig.imei = devices.imei
+            where devices.id in (" . $v->id . ")
+            group by devices.id;
+            ";
 
-        $query = "
-        select 
-            devices.id,
-            devices.idCliente clientID,
-            marker.id markerType,
-            marker.nombre markerName,
-            devices.imei,
-            devices.alias,
-            devices.estatus STATUS,
-            devices.fechaCreacion AS creationTimestamp,
-            reports.lat,
-            reports.lng,
-            reports.direccion address,
-            reports.fecha timestampReport,
-            (select idFlotilla from t_flotilla_relacion_dispositivo where idDispositivo = devices.id) as fleetID,
-            deviceConfig.reporteMovimiento AS deviceDrivingInterval,
-            deviceConfig.reporteDetenido AS deviceParkingInterval,
-            76 AS gsmStrength            
-        from t_dispositivos devices
-        LEFT JOIN cat_tipomarcador AS marker ON marker.id = devices.idTipoMarcador
-        LEFT JOIN t_reportes PARTITION (" . $partitions->partits . ") AS reports ON reports.id in (select MAX(id) as id from t_reportes PARTITION(" . $partitions->partits . ") group by deviceId)
-        LEFT JOIN t_dispositivos_configuracion AS deviceConfig ON deviceConfig.imei = devices.imei
-        where devices.id in (" . $partitions->ids . ")
-        group by devices.id;
-        ";         
+            array_push($result, $this->db->query($query)->result()[0]);
+        }
 
-        $resultSet = $this->db->query($query);
-        $resultSet = $resultSet->result();
-        return $resultSet;
+        return $result;
     }
 
 
